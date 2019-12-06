@@ -1,0 +1,19 @@
+{
+  "name": "@glate/core",
+  "version": "0.0.1",
+  "main": "dist/index",
+  "types": "dist/index",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "clean": "rm -rf ./dist",
+    "compile": "tsc -p tsconfig.build.json",
+    "watch": "npm run compile -- -w",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "~3.4.5"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@glate/express",
+  "version": "0.0.1",
+  "main": "dist/index",
+  "types": "dist/index",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "clean": "rm -rf ./dist",
+    "compile": "tsc -p tsconfig.build.json",
+    "watch": "npm run compile -- -w",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@glate/core": "^0.0.1",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "typescript": "~3.4.5"
+  }
+}

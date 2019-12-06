@@ -1,0 +1,19 @@
+{
+  "name": "lerna-ts",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "watch": "lerna run watch",
+    "clean": "lerna run clean",
+    "build": "lerna run build",
+    "pub": "lerna publish"
+  },
+  "devDependencies": {
+    "lerna": "~3.14.0",
+    "typescript": "~3.4.5"
+  }
+}
