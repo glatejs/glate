@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "name": "hello-world",
+  "version": "0.0.1",
+  "main": "dist/index",
+  "types": "dist/index",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "watch": "ts-node-dev ./src/index.ts",
+    "clean": "rm -rf ./dist",
+    "compile": "tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@glate/core": "^0.0.1",
+    "@glate/express": "^0.0.1"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^1.0.0-pre.44",
+    "typescript": "~3.4.5"
+  }
+}
