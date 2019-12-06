@@ -1,24 +1,54 @@
 # Glate
 
-Build scalable future-proof web backends using your existing React skills.
+Glate is a simple functional Node.js framework. It aims to leverage your React skills to backend development.
 
 ## The Glate Story
 
-Glate was borns as an alternative to NestJS (a powerful backend framework inspired by Angular). Unfortunately, NestJS has inherited all the over-engineered complexity of Angular. 
+Glate was borns as an alternative to NestJS (a powerful backend framework inspired by Angular). Unfortunately, NestJS has inherited all the over-engineering practices and complexity of Angular that are not acceptable for many React developers.
 
-Glate aims to let you leverage your React skills and use a straightforward yet flexible and powerful functional approach to your backend development.
+## The Principles Behind Glate
 
-## Main Principles Behind Glate
+- React philosophy extended to the backend and the cloud.
+- React-Glate-AWS as an alternative to  Angular-NestJS-Google.
+- As simple as an event dispatcher.
+- Agnostic to event sources and destinations.
+- Agnostic to database engines.
+- Extensibility in its core.
+- Fast and stateless.
+- Ready for serverless cloud and local environment.
+- Unit-testable and ready for CI/CD pipelines.
+- Built for monolithic and microservices architectures.
 
-- Spread the React philosophy and extend its ecosystem to the backend and the cloud.
-- Become the React-Glate-AWS alternative to the Angular-NestJS-Google stack.
-- Be as simple as an event dispatcher.
-- Be agnostic to event sources and destinations.
-- Be agnostic to database engines.
-- Provide clear extensibility and integration points.
-- Provide an official set of production-ready integrations with popular services/technologies.
-- Work perfectly in the serverless cloud and local environments.
-- Be unit-testable and ready for CI/CD pipelines.
-- Be fast and stateless.
-- Be suitable for both monolithic and microservices architectures.
-- Provide the best possible developer experience to build scalable serverless React apps on top of the AWS cloud.
+## How It Works
+
+## A Sample API Based on Express.js
+
+```bash
+npm i @glate/core @glate/driver-express
+```
+
+```js
+import express from 'express';
+import { createServer } from '@glate/core';
+import { createExpressDriver, useRouter, useParam } from '@glate/driver-express';
+
+const hello = () => {
+    const { name } = useParams();
+    const { setBody } = useResponse();
+    setBody({ message: `Hello ${name}` });
+};
+
+const glateApp = () => {
+    switchRoutes(
+        route('/:name', hello)
+    );
+};
+
+const main = () => {
+    const app = express();
+    const driver = createExpressDriver(app);
+    createServer(driver, glateApp);
+    app.listen(3000);
+};
+
+```
