@@ -31,14 +31,12 @@ export const useState = (initialState?: any) => {
 }
 
 export const useContext = (symbol: symbol, initialState?: any) => {
-    console.log('symbol: ', symbol);
     const requestContext = useActiveContext();
     const states = requestContext.contextStates;
     if (!(symbol in states)) {
         states[symbol] = initialState;
     }
     const state = states[symbol];
-    console.log('state: ', state);
     return [
         state,
         (newState) => {

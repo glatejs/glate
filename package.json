@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "watch": "lerna run watch",
+    "watch": "lerna run watch --parallel",
     "clean": "lerna run clean",
     "build": "lerna run build",
     "pub": "lerna publish"
