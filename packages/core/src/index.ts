@@ -11,9 +11,9 @@ export const useRequest = () => {
     return context.request;
 }
 
-export const useResponse = () => {
+export const useResponseState = () => {
     const context = useActiveContext();
-    return context.response;
+    return context.responseState;
 }
 
 export const useState = (initialState?: any) => {
@@ -26,6 +26,23 @@ export const useState = (initialState?: any) => {
         state,
         (newState) => {
             states[index] = newState;
+        }
+    ];
+}
+
+export const useContext = (symbol: symbol, initialState?: any) => {
+    console.log('symbol: ', symbol);
+    const requestContext = useActiveContext();
+    const states = requestContext.contextStates;
+    if (!(symbol in states)) {
+        states[symbol] = initialState;
+    }
+    const state = states[symbol];
+    console.log('state: ', state);
+    return [
+        state,
+        (newState) => {
+            states[symbol] = newState;
         }
     ];
 }
@@ -63,33 +80,28 @@ export const useAsync = (asyncFn) => (...args) => {
     return result;
 }
 
-const createRequestHandler = (userHandler) => async (request) => {
-    const requestContext = {
-        request,
+export const dispatch = async (handler, init, finalize) => {
+    const eventContext = {
         pendingEffects: [],
         effectDeps: {},
         states: [],
-        currentStateIndex: 0,
-        currentEffectIndex: 0,
+        contextStates: {},
     };
-    activateContext(requestContext);
-    const checkPendingEffects = () => {
-        return requestContext.pendingEffects.length;
-    };
-    let response = userHandler();
-    while (checkPendingEffects()) {
-        await Promise.all(requestContext.pendingEffects);
-        requestContext.currentStateIndex = 0;
-        requestContext.currentEffectIndex = 0;
-        response = userHandler();
-    }
-    return response;
-};
+    activateContext(eventContext);
+    init();
 
-export const createServer = (eventDriver, handler) => {
-    const requestHandler = createRequestHandler(handler);
-    eventDriver.setEventHandler(async (request, respond) => {
-        const response = await requestHandler(request);
-        respond(response);
-    });
+    let lastPassContext;
+    do {
+        lastPassContext = {
+            ...eventContext,
+            currentStateIndex: 0,
+            currentEffectIndex: 0,
+        };
+        activateContext(lastPassContext);
+        handler();
+        await Promise.all(eventContext.pendingEffects);
+    } while(eventContext.pendingEffects.length);
+
+    activateContext(lastPassContext);
+    finalize();
 };

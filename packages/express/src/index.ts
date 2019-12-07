@@ -1,8 +1,10 @@
-import express from 'express';
-import { createServer, useRequest, useResponse as useResponseCore } from '@glate/core';
+import { dispatch, useContext } from '@glate/core';
+
+const REQUEST_SYMBOL = Symbol('Express request');
+const RESPONSE_SYMBOL = Symbol('Response data collector');
 
 export const useParams = () => {
-    const req = useRequest();
+    const [ req ] = useContext(REQUEST_SYMBOL);
     return req.params;
 }
 
@@ -12,39 +14,41 @@ export const useParam = (paramName) => {
 }
 
 export const useResponse = () => {
-    const res = useResponseCore();
+    const [ response, setResponse ] = useContext(RESPONSE_SYMBOL);
     const setBody = (body) => {
-        res.body = body;
+        setResponse({
+            ...response,
+            body,
+        });
     };
     return {
+        response,
         setBody,
     };
 }
 
-export const createExpressEventDriver = (app) => {
-    let eventHandler;
-    app.use('/:test?', async (req, res, next) => {
-        const respond = (response) => {
-            console.log('\nRequest: ' + req.originalUrl);
-            console.log('Response: ' + response);
-            res.send(JSON.stringify(response.body));
-        }
-        await eventHandler(req, respond);
-        next();
-    });
-    return {
-        setEventHandler: (handler) => eventHandler = handler
+export const useRouter = () => {
+    const route = (path, handler) => {
+        // TODO
     };
+    return {
+        route,
+    }
 };
 
-export const createExpressServer = (appHandler) => {
-    const app = express();
-    const driver = createExpressEventDriver(app);
-    createServer(driver, appHandler);
-    return {
-        express,
-        listen: (port) => {
-            app.listen(port);
-        }
-    }
+export const glate = (glateHandler) => (req, res, next) => {
+    const initContext = () => {
+        useContext(REQUEST_SYMBOL, req);
+        useContext(RESPONSE_SYMBOL, {});
+    };
+    const finalize = () => {
+        const [ response ] = useContext(RESPONSE_SYMBOL);
+        res.send(response.body);
+        next();
+    };
+    dispatch(
+        glateHandler,
+        initContext,
+        finalize,
+    );
 };
