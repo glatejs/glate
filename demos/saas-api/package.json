@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@examples/hello-world",
+  "name": "@demos/saas-api",
   "version": "0.0.1",
   "main": "dist/index",
   "types": "dist/index",
@@ -16,10 +16,12 @@
   },
   "dependencies": {
     "@glate/core": "^0.0.1",
-    "@glate/http": "^0.0.1"
+    "@glate/http": "^0.0.1",
+    "typeorm": "^0.2.21"
   },
   "devDependencies": {
     "ts-node-dev": "^1.0.0-pre.44",
+    "tslint": "^5.20.1",
     "typescript": "~3.4.5"
   }
 }

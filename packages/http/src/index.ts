@@ -1,3 +1,5 @@
+import express from 'express';
+import bodyParser from 'body-parser';
 import { match as createMatcher } from 'path-to-regexp';
 import { dispatch, useContext } from '@glate/core';
 
@@ -26,9 +28,24 @@ export const useResponse = () => {
         setBody,
         setBodyFragment,
     };
-}
+};
 
-export const useRoute = (path, handler) => {
+// export const useRouter = () => {
+//     return {
+//         useRoute: (path: string, handler: () => void) => () => useRoute(path, handler),
+//         switcher,
+//     };
+// };
+
+// const useSwitch = (...routes) => {
+//     let matched = false;
+//     while (!matched) {
+//         const route = routes.shift();
+//         matched = route();
+//     }
+// };
+
+export const useRoute = (path: string, handler: () => void): boolean => {
     const req = useRequest();
     const [ parentMatch, setRouteMatch ] = useContext(ROUTER_SYMBOL);
 
@@ -38,7 +55,9 @@ export const useRoute = (path, handler) => {
         setRouteMatch(match);
         handler();
         setRouteMatch(parentMatch);
+        return true;
     }
+    return false;
 };
 
 export const useRouteMatch = () => {
@@ -56,7 +75,7 @@ export const useParam = (paramName) => {
     return params[paramName];
 }
 
-export const glate = (glateHandler) => (req, res, next) => {
+const createMiddleware = (glateHandler) => (req, res, next) => {
     const initContext = () => {
         useContext(REQUEST_SYMBOL, req);
         useContext(RESPONSE_SYMBOL, {});
@@ -71,4 +90,13 @@ export const glate = (glateHandler) => (req, res, next) => {
         initContext,
         finalize,
     );
+};
+
+export const createHttpServer = (httpHandler) => {
+    const app = express();
+    app.use(bodyParser.urlencoded());
+    app.use(createMiddleware(httpHandler));
+    return {
+        listen: (port) => app.listen(port),
+    }
 };

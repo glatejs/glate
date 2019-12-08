@@ -1,5 +1,5 @@
 {
-  "name": "@glate/express",
+  "name": "@glate/http",
   "version": "0.0.1",
   "main": "dist/index",
   "types": "dist/index",

@@ -3,17 +3,19 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "examples/*"
+    "examples/*",
+    "demos/*"
   ],
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "watch": "lerna run watch --parallel",
-    "clean": "lerna run clean",
-    "build": "lerna run build",
-    "pub": "lerna publish"
+    "watch": "lerna run watch --parallel --scope @glate/*",
+    "clean": "lerna run clean --scope @glate/*",
+    "build": "lerna run build --scope @glate/*",
+    "pub": "lerna publish --scope @glate/*"
   },
   "devDependencies": {
     "lerna": "~3.14.0",
+    "tslint": "^5.20.1",
     "typescript": "~3.4.5"
   }
 }
