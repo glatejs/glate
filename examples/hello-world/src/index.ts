@@ -1,15 +1,15 @@
 import express from 'express';
-import { glate, useRouter, useParams, useResponse } from '@glate/express';
+import { glate, useRoute, useParams, useResponse } from '@glate/express';
 
 const hello = () => {
     const { name } = useParams();
     const { setBody } = useResponse();
-    setBody({ message: `Hello ${name}` });
+
+    setBody(`Hello ${name}`);
 };
 
 const handler = () => {
-    const { route } = useRouter();
-    route('/:name', hello);
+    useRoute('/:name?', hello);
 };
 
 const main = () => {

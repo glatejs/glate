@@ -1,23 +1,18 @@
-let activeRequestContext;
+let activeHandlerContext;
 
-const activateContext = (requestContext) => {
-    activeRequestContext = requestContext;
+const activateHandlerContext = (handlerContext) => {
+    activeHandlerContext = handlerContext;
 }
 
-export const useActiveContext = () => activeRequestContext;
-
-export const useRequest = () => {
-    const context = useActiveContext();
-    return context.request;
-}
+export const useHandlerContext = () => activeHandlerContext;
 
 export const useResponseState = () => {
-    const context = useActiveContext();
+    const context = useHandlerContext();
     return context.responseState;
 }
 
 export const useState = (initialState?: any) => {
-    const requestContext = useActiveContext();
+    const requestContext = useHandlerContext();
     const states = requestContext.states;
     const index = requestContext.currentStateIndex;
     const state = states.length === index ? initialState : states[index];
@@ -31,7 +26,7 @@ export const useState = (initialState?: any) => {
 }
 
 export const useContext = (symbol: symbol, initialState?: any) => {
-    const requestContext = useActiveContext();
+    const requestContext = useHandlerContext();
     const states = requestContext.contextStates;
     if (!(symbol in states)) {
         states[symbol] = initialState;
@@ -46,7 +41,7 @@ export const useContext = (symbol: symbol, initialState?: any) => {
 }
 
 export const useEffect = (callback, deps) => {
-    const requestContext = useActiveContext();
+    const requestContext = useHandlerContext();
     const index = requestContext.currentEffectIndex;
     requestContext.currentEffectIndex++;
 
@@ -64,7 +59,7 @@ export const useEffect = (callback, deps) => {
     effect.finally(() => {
         const jobIndex = pendingEffects.findIndex((item) => item === effect);
         pendingEffects.splice(jobIndex, 1);
-        activateContext(requestContext);
+        activateHandlerContext(requestContext);
     })
     pendingEffects.push(effect);
 };
@@ -85,7 +80,7 @@ export const dispatch = async (handler, init, finalize) => {
         states: [],
         contextStates: {},
     };
-    activateContext(eventContext);
+    activateHandlerContext(eventContext);
     init();
 
     let lastPassContext;
@@ -95,11 +90,11 @@ export const dispatch = async (handler, init, finalize) => {
             currentStateIndex: 0,
             currentEffectIndex: 0,
         };
-        activateContext(lastPassContext);
+        activateHandlerContext(lastPassContext);
         handler();
         await Promise.all(eventContext.pendingEffects);
     } while(eventContext.pendingEffects.length);
 
-    activateContext(lastPassContext);
+    activateHandlerContext(lastPassContext);
     finalize();
 };

@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "@glate/core": "^0.0.1",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "path-to-regexp": "^6.1.0"
   },
   "devDependencies": {
     "typescript": "~3.4.5"
