@@ -7,13 +7,9 @@ const hello = () => {
     setBody(`Hello ${name}`);
 };
 
-const httpHandler = () => {
+const app = () => {
     useRoute('/:name?', hello);
 };
 
-const main = () => {
-    const server = createHttpServer(httpHandler);
-    server.listen(3000);
-};
-
-main();
+const server = createHttpServer(app);
+server.listen(3000);

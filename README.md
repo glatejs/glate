@@ -1,54 +1,61 @@
-# Glate
+# Glate + React + AWS = ❤️
 
-Glate is a simple functional Node.js framework. It aims to leverage your React skills to backend development.
+Glate is a simple yet powerful functional Node.js framework. It aims to leverage your existing React skills to backend development and the AWS Cloud.
 
-## The Glate Story
+## Why Glate?
 
-Glate was borns as an alternative to NestJS (a powerful backend framework inspired by Angular). Unfortunately, NestJS has inherited all the over-engineering practices and complexity of Angular that are not acceptable for many React developers.
-
-## The Principles Behind Glate
-
-- React philosophy extended to the backend and the cloud.
-- React-Glate-AWS as an alternative to  Angular-NestJS-Google.
-- As simple as an event dispatcher.
-- Agnostic to event sources and destinations.
-- Agnostic to database engines.
-- Extensibility in its core.
-- Fast and stateless.
+- Functional - don't overcomplicate your apps with OOP.
+- Extensible and lightweight by design.
 - Ready for serverless cloud and local environment.
+- Loves both monolithic and microservices architectures.
 - Unit-testable and ready for CI/CD pipelines.
-- Built for monolithic and microservices architectures.
+- Same skills for frontend and backend development.
+- Seamlessly integrated with AWS services.
 
-## How It Works
+## Getting Started
 
-## A Sample API Based on Express.js
+### Installation
 
 ```bash
-npm i @glate/core @glate/driver-express
+$ npm i @glate/core @glate/http
 ```
 
+### Implement Your Backend API
+
 ```js
-import express from 'express';
-import { createServer } from '@glate/core';
-import { createExpressDriver, useRouter, useParam } from '@glate/driver-express';
+// app.js
+import { useRoute, useParams, useResponse } from '@glate/http';
 
 const hello = () => {
     const { name } = useParams();
     const { setBody } = useResponse();
-    setBody({ message: `Hello ${name}` });
+
+    setBody(`Hello ${name}!`);
 };
 
-const glateApp = () => {
-    switchRoutes(
-        route('/:name', hello)
-    );
+export const app = () => {
+    useRoute('/:name?', hello);
 };
+```
 
-const main = () => {
-    const app = express();
-    const driver = createExpressDriver(app);
-    createServer(driver, glateApp);
-    app.listen(3000);
-};
+### Test It Locally
 
+```js
+// server.js
+import { createHttpServer } from '@glate/http';
+import { app } from './app';
+
+const server = createHttpServer(app);
+server.listen(3000);
+```
+
+```bash
+# Start our HTTP server
+$ node server
+```
+
+```bash
+# Make an HTTP GET request
+$ curl http://localhost:3000/glate
+Hello glate!
 ```
