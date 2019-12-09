@@ -40,7 +40,7 @@ export const useContext = (symbol: symbol, initialState?: any) => {
     ];
 }
 
-export const useEffect = (callback, deps) => {
+export const useEffect = (callback, deps?: any[]) => {
     const requestContext = useHandlerContext();
     const index = requestContext.currentEffectIndex;
     requestContext.currentEffectIndex++;

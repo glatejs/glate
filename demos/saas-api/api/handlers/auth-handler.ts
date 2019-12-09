@@ -10,96 +10,8 @@ import { UserError, ErrorCodes } from '../utils/user-error';
 import { generateJwtToken } from '../utils/jwt';
 import { IUserContext, IMembershipContext, UserContext, UserContextRequired } from '../decorators/user-context';
 
-const generateUserToken = (user: User) => {
-    const token = generateJwtToken({
-        userId: user.id,
-    });
-    return token;
-};
 
-export const authHandler = () => {
-    const { route, all } = useRouter();
-
-    route(
-        all('/form', formHandler),
-    );
-};
-
-const formHandler = () => {
-    const { route, post, get } = useRouter();
-
-    route(
-        post('/register', registerHandler),
-        post('/invite', inviteHandler),
-        post('/login', loginHandler),
-        post('/change-password', changePasswordHandler),
-        get('/profile', profileHandler),
-    );
-};
-
-// @InjectRepository(User)
-// userRepository: Repository<User>,
-// @InjectRepository(Invite)
-// inviteRepository: Repository<Invite>,
-// @InjectRepository(Membership)
-// membershipRepository: Repository<Membership>,
-// @InjectRepository(Account)
-// accountRepository: Repository<Account>,
-
-const registerHandler = async (): Promise<{ user: User, token: string}> => {
-    const { email, password } = useBodyJson();
-    const users = useRepository(User);
-    const invites = useRepository(Invite);
-    const memberships = useRepository(Membership);
-    const { setBodyFragment } = useResponse();
-
-    useEffect(async () => {
-        const existingUser = await users.findOne({
-            where: {
-                email,
-            },
-        });
-        if (existingUser) {
-            throw new UserError(ErrorCodes.USER_ALREADY_EXISTS, `User '${email}' already exists`);
-        }
-
-        const user = new User();
-        Object.assign(user, {
-            email,
-            password: bcrypt.hashSync(password, 8),
-        });
-        const newUser = await users.save(user);
-
-        setBodyFragment({
-            user: newUser,
-            token: generateUserToken(newUser),
-        });
-
-        const invite = await users.findOne({
-            where: {
-                email,
-                accepted: false,
-            },
-        });
-        const membership = new Membership();
-        membership.user = user;
-        if (invite) {
-            membership.account = invite.account;
-            membership.role = MembershipRole.MEMBER;
-            invite.accepted = true;
-            await invites.save(invite);
-        } else {
-            const account = new Account();
-            account.title = 'My Notes';
-            await invites.save(account);
-            membership.account = account;
-            membership.role = MembershipRole.ADMIN;
-        }
-        await memberships.save(membership);
-    });
-};
-
-const inviteHandler = async (
+const invite = async (
     @UserContext({ required: UserContextRequired.MEMBERSHIP }) context: IMembershipContext,
     @BodyParam('email') email: string,
 ): Promise<Invite> => {
@@ -127,7 +39,7 @@ const inviteHandler = async (
     return await this.inviteRepository.save(invite);
 }
 
-const loginHandler = async (
+const login = async (
     @BodyParam('email') email: string,
     @BodyParam('password') password: string,
 ): Promise<{ user: User, token: string }> => {
@@ -146,7 +58,7 @@ const loginHandler = async (
     return { user, token: generateUserToken(user) };
 }
 
-const changePasswordHandler = async (
+const changePassword = async (
     @UserContext({ required: UserContextRequired.USER }) context: IUserContext,
     @BodyParam('old-password') oldPassword: string,
     @BodyParam('new-password') newPassword: string,
@@ -165,7 +77,7 @@ const changePasswordHandler = async (
     return await this.userRepository.save(context.user);
 }
 
-const profileHandler = (
+const profile = (
     @UserContext({ required: UserContextRequired.USER }) context: IUserContext,
 ): User => {
     return context.user;

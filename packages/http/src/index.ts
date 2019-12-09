@@ -1,16 +1,38 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { match as createMatcher } from 'path-to-regexp';
-import { dispatch, useContext } from '@glate/core';
+import { dispatch, useContext, useAsync, useEffect } from '@glate/core';
 
-const REQUEST_SYMBOL = Symbol('Express request');
+const EXPRESS_REQUEST_SYMBOL = Symbol('Express request');
+const EXPRESS_RESPONSE_SYMBOL = Symbol('Express response');
 const RESPONSE_SYMBOL = Symbol('Response data collector');
 const ROUTER_SYMBOL = Symbol('Router match');
 
-export const useRequest = () => {
-    const [ req ] = useContext(REQUEST_SYMBOL);
+const useExpressRequest = () => {
+    const [ req ] = useContext(EXPRESS_REQUEST_SYMBOL);
     return req;
-}
+};
+
+const useExpressResponse = () => {
+    const [ res ] = useContext(EXPRESS_RESPONSE_SYMBOL);
+    return res;
+};
+
+const useExpressMiddleware = (middleware) => {
+    const req = useExpressRequest();
+    const res = useExpressResponse();
+    const applied = useAsync(async () => {
+        await new Promise((resolve, reject) => middleware(req, res, resolve));
+        return true;
+    });
+    return { applied };
+};
+
+export const useBodyJson = () => {
+    useExpressMiddleware(bodyParser.urlencoded()); // TODO optimize
+    const req = useExpressRequest();
+    return req.body;
+};
 
 export const useResponse = () => {
     const [ response, setResponse ] = useContext(RESPONSE_SYMBOL);
@@ -46,7 +68,7 @@ export const useResponse = () => {
 // };
 
 export const useRoute = (path: string, handler: () => void): boolean => {
-    const req = useRequest();
+    const req = useExpressRequest();
     const [ parentMatch, setRouteMatch ] = useContext(ROUTER_SYMBOL);
 
     const matcher = createMatcher(path);
@@ -77,7 +99,7 @@ export const useParam = (paramName) => {
 
 const createMiddleware = (glateHandler) => (req, res, next) => {
     const initContext = () => {
-        useContext(REQUEST_SYMBOL, req);
+        useContext(EXPRESS_REQUEST_SYMBOL, req);
         useContext(RESPONSE_SYMBOL, {});
     };
     const finalize = () => {
