@@ -1,10 +1,6 @@
-import { useRouter } from '@glate/http';
+import { useRoute } from '@glate/http';
 import { formAuth } from './form';
 
 export const authHandler = () => {
-    const { route, all } = useRouter();
-
-    route(
-        all('/form', formAuth),
-    );
+    useRoute('/form', formAuth);
 };

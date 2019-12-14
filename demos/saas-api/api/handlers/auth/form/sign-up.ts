@@ -16,15 +16,11 @@ const generateUserToken = (user: User) => {
     return token;
 };
 
-const useTypeOrmRepo = (entityType: any) => {
-    return getRepository(entityType);
-};
-
-const useTypeOrmRepos = (...types: any[]) => types.map((t) => useTypeOrmRepo(t));
-
 export const signUp = () => {
     const { email, password } = useBodyJson();
-    const [users, invites, memberships] = useTypeOrmRepos(User, Invite, Membership);
+    const users = getRepository(User);
+    const invites = getRepository(Invite);
+    const memberships = getRepository(Membership);
     const { setBodyFragment } = useResponse();
 
     // const { currentUser } = useCurrentUser(); // don't run effects until async hooks are resolved
@@ -51,7 +47,7 @@ export const signUp = () => {
             token: generateUserToken(newUser),
         });
 
-        const invite = await users.findOne({
+        const invite = await invites.findOne({
             where: {
                 email,
                 accepted: false,

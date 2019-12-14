@@ -1,19 +1,13 @@
 import 'reflect-metadata';
 
-import { createHttpServer, useRoute, useParams, useResponse } from '@glate/http';
-import { userHandler } from './handlers/user-handler';
-import { rootHandler } from './handlers/root-handler';
-import { authHandler } from './handlers/auth-handler';
-import { noteHandler } from './handlers/note-handler';
+import { useRoute } from '@glate/http';
+import { authHandler } from './handlers/auth';
 
-
-const hello = () => {
-    const { name } = useParams();
-    const { setBody } = useResponse();
-
-    setBody(`Hello ${name}`);
-};
+// import { userHandler } from './handlers/user-handler';
+// import { rootHandler } from './handlers/root-handler';
+// import { noteHandler } from './handlers/note-handler';
 
 export const httpHandler = () => {
-    useRoute('/:name?', hello);
+    console.log('test2')
+    useRoute('/auth', authHandler);
 };

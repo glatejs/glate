@@ -10,7 +10,6 @@ import { UserError, ErrorCodes } from '../utils/user-error';
 import { generateJwtToken } from '../utils/jwt';
 import { IUserContext, IMembershipContext, UserContext, UserContextRequired } from '../decorators/user-context';
 
-
 const invite = async (
     @UserContext({ required: UserContextRequired.MEMBERSHIP }) context: IMembershipContext,
     @BodyParam('email') email: string,

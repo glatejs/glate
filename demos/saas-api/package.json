@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "watch": "ts-node-dev ./src/index.ts",
+    "watch": "ts-node-dev ./local/server.ts",
     "clean": "rm -rf ./dist",
     "compile": "tsc -p tsconfig.json",
     "prepublishOnly": "npm run build"
@@ -18,10 +18,12 @@
     "@glate/core": "^0.0.1",
     "@glate/http": "^0.0.1",
     "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^8.5.1",
     "typeorm": "^0.2.21"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^8.3.5",
     "ts-node-dev": "^1.0.0-pre.44",
     "tslint": "^5.20.1",
     "typescript": "~3.4.5"

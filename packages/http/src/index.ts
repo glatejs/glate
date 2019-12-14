@@ -8,6 +8,15 @@ const EXPRESS_RESPONSE_SYMBOL = Symbol('Express response');
 const RESPONSE_SYMBOL = Symbol('Response data collector');
 const ROUTER_SYMBOL = Symbol('Router match');
 
+enum HttpMethods {
+    GET = 'GET',
+    POST = 'POST',
+    PUT = 'PUT',
+    DELETE = 'DELETE',
+    OPTIONS = 'OPTIONS',
+    ANY = '*',
+}
+
 const useExpressRequest = () => {
     const [ req ] = useContext(EXPRESS_REQUEST_SYMBOL);
     return req;
@@ -34,6 +43,11 @@ export const useBodyJson = () => {
     return req.body;
 };
 
+export const useHttpMethod = () => {
+    const req = useExpressRequest();
+    return req.method;
+};
+
 export const useResponse = () => {
     const [ response, setResponse ] = useContext(RESPONSE_SYMBOL);
     const setBody = (body) => {
@@ -52,52 +66,57 @@ export const useResponse = () => {
     };
 };
 
-// export const useRouter = () => {
-//     return {
-//         useRoute: (path: string, handler: () => void) => () => useRoute(path, handler),
-//         switcher,
-//     };
-// };
+export type IHandlerMap = {
+    [key in keyof typeof HttpMethods]?: () => any
+};
 
-// const useSwitch = (...routes) => {
-//     let matched = false;
-//     while (!matched) {
-//         const route = routes.shift();
-//         matched = route();
-//     }
-// };
+const isHandlerMap = (arg: any): boolean => {
+    return typeof arg === 'object';
+};
 
-export const useRoute = (path: string, handler: () => void): boolean => {
+export const useRoute = (path: string, handler: IHandlerMap | (() => any)): any => {
     const req = useExpressRequest();
     const [ parentMatch, setRouteMatch ] = useContext(ROUTER_SYMBOL);
 
-    const matcher = createMatcher(path);
+    const matcher = createMatcher(path, { end: false });
     const match = matcher(req.originalUrl);
+    console.log(`matching: ${path}`, req.originalUrl);
     if (match) {
+        console.log('match', req.originalUrl);
         setRouteMatch(match);
-        handler();
+
+        if (isHandlerMap(handler)) {
+            const method = useHttpMethod();
+            const methodHandler = handler[method];
+            if (!methodHandler) {
+                throw new Error(`${method} handler not found`);
+            }
+            methodHandler();
+        } else {
+            (handler as () => void)();
+        }
+
         setRouteMatch(parentMatch);
-        return true;
     }
-    return false;
 };
 
 export const useRouteMatch = () => {
     const [ match ] = useContext(ROUTER_SYMBOL);
     return match;
-}
+};
 
 export const useParams = () => {
     const match = useRouteMatch();
     return match ? match.params : {};
-}
+};
 
 export const useParam = (paramName) => {
     const params = useParams();
     return params[paramName];
-}
+};
 
 const createMiddleware = (glateHandler) => (req, res, next) => {
+    console.log('Express request');
     const initContext = () => {
         useContext(EXPRESS_REQUEST_SYMBOL, req);
         useContext(RESPONSE_SYMBOL, {});
@@ -116,9 +135,8 @@ const createMiddleware = (glateHandler) => (req, res, next) => {
 
 export const createHttpServer = (httpHandler) => {
     const app = express();
-    app.use(bodyParser.urlencoded());
     app.use(createMiddleware(httpHandler));
     return {
         listen: (port) => app.listen(port),
-    }
+    };
 };
