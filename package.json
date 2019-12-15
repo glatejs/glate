@@ -11,7 +11,8 @@
     "watch": "lerna run watch --parallel --scope @glate/*",
     "clean": "lerna run clean --scope @glate/*",
     "build": "lerna run build --scope @glate/*",
-    "pub": "lerna publish --scope @glate/*"
+    "pub": "lerna publish --scope @glate/*",
+    "test": "lerna run test --stream --scope @glate/*"
   },
   "devDependencies": {
     "lerna": "~3.14.0",

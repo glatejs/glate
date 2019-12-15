@@ -8,7 +8,7 @@ const hello = () => {
 };
 
 const app = () => {
-    useRoute('/:name?', hello);
+    useRoute('/hello/:name?', hello);
 };
 
 const server = createHttpServer(app);

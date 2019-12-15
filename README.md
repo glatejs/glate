@@ -1,30 +1,34 @@
-# Glate + React + AWS = ❤️
+# Glate + React = ❤️
 
-Glate is a simple yet powerful functional Node.js framework. It aims to leverage your existing React skills to backend development and the AWS Cloud.
+Glate is a simple yet powerful React-inspired library for Node.js backend development. Become a fullstack developer in minutes reusing your React skills.
 
 ## Why Glate?
 
-- Functional - don't overcomplicate your apps with OOP.
-- Extensible and lightweight by design.
+- As simple as React is.
+- Its' functional. Don't overengeneer your apps with OOP.
+- Extensible, lightweight, and scalable.
 - Ready for serverless cloud and local environment.
 - Loves both monolithic and microservices architectures.
 - Unit-testable and ready for CI/CD pipelines.
 - Same skills for frontend and backend development.
-- Seamlessly integrated with AWS services.
 
-## Getting Started
-
-### Installation
+## Installation
 
 ```bash
 $ npm i @glate/core @glate/http
 ```
 
-### Implement Your Backend API
+# Implement Your Backend API
+
+## Create a Glate App
 
 ```js
 // app.js
 import { useRoute, useParams, useResponse } from '@glate/http';
+
+export const app = () => {
+    useRoute('/hello/:name?', hello);
+};
 
 const hello = () => {
     const { name } = useParams();
@@ -32,13 +36,9 @@ const hello = () => {
 
     setBody(`Hello ${name}!`);
 };
-
-export const app = () => {
-    useRoute('/:name?', hello);
-};
 ```
 
-### Test It Locally
+## Run It Locally
 
 ```js
 // server.js
@@ -56,6 +56,43 @@ $ node server
 
 ```bash
 # Make an HTTP GET request
-$ curl http://localhost:3000/glate
+$ curl http://localhost:3000/hello/glate
 Hello glate!
 ```
+
+## Unit Test It
+
+```js
+import { createMockServer } from '@glate/http';
+import { app } from './app';
+
+describe('hello', () => {
+    it('should work', async () => {
+        const server = createMockServer(app);
+        const response = await server.get('/hello/glate');
+        expect(response.body).toBe('Hello glate!');
+    });
+});
+```
+
+## Deploy It to AWS
+
+Coming soon...
+
+# Implement Your React Frontend
+
+## Create a React Application
+
+Coming soon...
+
+## Run It Locally
+
+Coming soon...
+
+## Deploy It to AWS
+
+Coming soon...
+
+# License
+
+MIT
